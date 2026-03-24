@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Media Flow - Pro Edition</title>
+    <title>Media Flow - Ultimate Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -18,18 +18,19 @@
         .dark .card { background: #161e2d; border: 1px solid #2d3748; }
         .light .card { background: #ffffff; border: 1px solid #e5e7eb; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
 
-        .media-wrapper { position: relative; width: 100%; aspect-ratio: 1/1; background: #000; }
+        .media-wrapper { position: relative; width: 100%; aspect-ratio: 1/1; background: #0f172a; }
         .media-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; height: 100%; }
         .media-container::-webkit-scrollbar { display: none; }
         
-        .media-item { flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
-        .media-item img, .media-item iframe { width: 100%; height: 100%; object-fit: cover; border: none; }
+        .media-item { flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; position: relative; }
+        .media-item img { width: 100%; height: 100%; object-fit: cover; }
 
         .dots-container { position: absolute; bottom: 15px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px; z-index: 20; pointer-events: none; }
-        .dot { width: 6px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; }
-        .dot.active { width: 18px; background: #fff; border-radius: 10px; }
+        .dot { width: 6px; height: 6px; background: rgba(255,255,255,0.4); border-radius: 50%; transition: 0.3s; }
+        .dot.active { width: 20px; background: #fff; border-radius: 10px; }
 
-        .drive-btn { position: absolute; top: 15px; left: 15px; z-index: 30; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); padding: 10px; border-radius: 14px; color: white; border: 1px solid rgba(255,255,255,0.1); }
+        .drive-btn { position: absolute; top: 15px; left: 15px; z-index: 30; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); padding: 10px; border-radius: 14px; color: white; border: 1px solid rgba(255,255,255,0.15); transition: 0.2s; }
+        .drive-btn:active { transform: scale(0.9); }
 
         .occasion-badge { background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; padding: 5px 14px; border-radius: 10px; font-weight: 800; font-size: 11px; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); }
 
@@ -48,7 +49,7 @@
     <nav class="sticky top-0 z-50 p-4 flex justify-between items-center backdrop-blur-xl bg-inherit/70 border-b border-white/5">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
-                <i data-lucide="layout-grid" class="w-6 h-6"></i>
+                <i data-lucide="monitor-play" class="w-6 h-6"></i>
             </div>
             <h1 class="font-black text-lg tracking-tight uppercase">Media Hub</h1>
         </div>
@@ -76,53 +77,175 @@
                     </div>
                     <input type="text" id="occasion" placeholder="مناسبة خاصة؟ (مثال: رمضان)" class="w-full p-5 rounded-2xl bg-gray-500/5 border border-white/5 outline-none">
                     <textarea id="captionDraft" placeholder="نص الكابشن..." class="w-full p-5 rounded-2xl bg-gray-500/5 border border-white/5 h-40 outline-none"></textarea>
-                    <textarea id="mediaUrls" placeholder="روابط جوجل درايف (افصل بـ |||)" class="w-full p-4 rounded-2xl bg-gray-500/5 border border-white/5 h-24 outline-none text-xs"></textarea>
-                    <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-black p-5 rounded-2xl shadow-xl active:scale-95 transition uppercase tracking-widest">Send to Sheet</button>
+                    
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold opacity-60 px-2">روابط جوجل درايف (ضع كل رابط في سطر)</label>
+                        <textarea id="mediaUrls" placeholder="الصق الرابط الأول هنا...&#10;الصق الرابط الثاني في سطر جديد..." class="w-full p-4 rounded-2xl bg-gray-500/5 border border-white/5 h-28 outline-none text-xs" dir="ltr"></textarea>
+                    </div>
+                    
+                    <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-black p-5 rounded-2xl shadow-xl active:scale-95 transition uppercase tracking-widest">إضافة للجدول</button>
                 </form>
             </div>
         </div>
     </main>
 
-    <script>
-        const API = 'https://script.google.com/macros/s/AKfycbznTvtaErEUBZpYduZj02LhTyWZtSjNd-mPYityXOyBdoBrsNh0ukPn5wKpAIS4L6iE/exec';
+    <nav class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white/10 dark:bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[35px] p-2 flex justify-around shadow-2xl z-50">
+        <button onclick="showTab('viewSection')" class="p-5 text-indigo-500 transition"><i data-lucide="layout-grid"></i></button>
+        <button onclick="showTab('addSection')" class="p-5 text-gray-400 transition"><i data-lucide="plus-circle"></i></button>
+    </nav>
 
-        function extractId(u) {
-            const m = u.match(/(?:id=|\/d\/|preview\/d\/)([\w-]{25,})/);
-            return m ? m[1] : u.trim();
+    <script>
+        const API = 'https://script.google.com/macros/s/AKfycbznTvtaErEUBZpYduZj02LhTyWZtSjNd-mPYityXOyBdoBrsNh0ukPn5wKpAIS4L6iE/exec
+';
+
+        // محرك ذكي لاستخراج ID درايف من أي نص 
+        function extractId(url) {
+            if (!url) return '';
+            const match = url.match(/[-\w]{25,}/); 
+            return match ? match[0] : url.trim();
         }
 
+        // إعداد بيانات الميديا مع نظام احتياطي للفشل
         function getMediaMeta(u) {
             const id = extractId(u);
             return {
-                id: id,
-                preview: `https://drive.google.com/file/d/${id}/preview`,
+                thumb: `https://drive.google.com/thumbnail?id=${id}&sz=w1000`,
+                // صورة بديلة في حال كان الفيديو قيد المعالجة من جوجل أو الرابط غير مدعوم للمعاينه المباشره
+                fallback: `https://ui-avatars.com/api/?name=Media+File&background=1e293b&color=fff&size=512&font-size=0.1`,
                 direct: `https://drive.google.com/file/d/${id}/view`
             };
+        }
+
+        async function fetchData() {
+            try {
+                const r = await fetch(API);
+                const d = await r.json();
+                render(d.reverse());
+            } catch(e) { console.error("Sync Error"); }
         }
 
         function render(items) {
             const container = document.getElementById('contentContainer');
             container.innerHTML = items.map(item => {
-                const urls = item.mediaUrls ? item.mediaUrls.split('|||').filter(x => x.trim()) : [];
+                // الحل الجذري: تقسيم الروابط بناءً على المسافات، الأسطر الجديدة (Enter)، أو |||
+                const rawUrls = item.mediaUrls ? item.mediaUrls.split(/(?:\|\|\||\r?\n|,)/) : [];
+                const urls = rawUrls.map(u => u.trim()).filter(u => u.length > 15);
+
                 return `
                 <div class="card shadow-2xl">
                     <div class="media-wrapper">
-                        <div class="media-container">
+                        <div class="media-container" onscroll="const idx = Math.round(this.scrollLeft / this.offsetWidth); updateDots(this, Math.abs(idx))">
                             ${urls.map(u => {
                                 const m = getMediaMeta(u);
                                 return `
                                 <div class="media-item">
-                                    <a href="${m.direct}" target="_blank" class="drive-btn">↗</a>
-                                    <iframe src="${m.preview}" class="w-full h-full"></iframe>
+                                    <a href="${m.direct}" target="_blank" class="drive-btn flex items-center gap-2">
+                                        <i data-lucide="external-link" class="w-4 h-4"></i>
+                                    </a>
+                                    <img src="${m.thumb}" onerror="this.onerror=null; this.src='${m.fallback}';" loading="lazy">
                                 </div>`;
                             }).join('')}
+                            ${urls.length === 0 ? `<div class="media-item flex items-center justify-center bg-gray-900"><i data-lucide="image-off" class="text-gray-600 w-12 h-12"></i></div>` : ''}
                         </div>
+                        ${urls.length > 1 ? `<div class="dots-container">${urls.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join('')}</div>` : ''}
+                    </div>
+                    
+                    <div class="p-6 space-y-5">
+                        <div class="flex justify-between items-start">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-black text-indigo-500">${item.date}</span>
+                                    <span class="text-[10px] opacity-40 uppercase font-black">${item.contentType}</span>
+                                </div>
+                                <h3 class="text-xl font-bold tracking-tight">${item.productName || 'بدون عنوان'}</h3>
+                            </div>
+                            <select onchange="updateStatus(${item.row_index}, this.value)" class="text-[11px] font-black p-2 px-4 rounded-xl border-none bg-gray-500/10 outline-none cursor-pointer">
+                                <option ${item.status==='جديد'?'selected':''}>جديد</option>
+                                <option ${item.status==='قيد المراجعة'?'selected':''}>قيد المراجعة</option>
+                                <option ${item.status==='مقبول'?'selected':''}>مقبول</option>
+                                <option ${item.status==='مرفوض'?'selected':''}>مرفوض</option>
+                            </select>
+                        </div>
+
+                        ${item.occasion ? `<div class="occasion-badge"><i data-lucide="sparkles" class="w-3 h-3"></i> ${item.occasion}</div>` : ''}
+                        
+                        <p id="txt-${item.row_index}" class="text-sm opacity-70 leading-relaxed line-clamp-3 font-medium whitespace-pre-wrap">${item.captionDraft || '...'}</p>
+                        
+                        <button onclick="copyCaption('${item.row_index}')" class="w-full bg-indigo-500/10 hover:bg-indigo-600 hover:text-white p-4 rounded-2xl text-xs font-black transition flex justify-center items-center gap-2">
+                            <i data-lucide="copy"></i> نسخ الكابشن
+                        </button>
                     </div>
                 </div>`;
             }).join('');
+            lucide.createIcons();
         }
 
+        function updateDots(el, i) {
+            const ds = el.parentElement.querySelectorAll('.dot');
+            ds.forEach((d, idx) => d.classList.toggle('active', idx === i));
+        }
+
+        async function updateStatus(row, val) {
+            showToast("جاري التحديث...");
+            await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "updateStatus", row_index: row, newStatus: val }) });
+            showToast("تم تحديث الحالة ✅");
+        }
+
+        function copyCaption(rowId) {
+            const text = document.getElementById(`txt-${rowId}`).innerText;
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showToast("تم النسخ بنجاح ✨");
+        }
+
+        function showToast(m) {
+            const t = document.getElementById('toast');
+            t.innerText = m; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        function toggleTheme() {
+            const b = document.body;
+            b.classList.toggle('dark');
+            b.classList.toggle('light');
+            document.getElementById('themeIcon').setAttribute('data-lucide', b.classList.contains('dark') ? 'sun' : 'moon');
+            lucide.createIcons();
+        }
+
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'viewSection') fetchData();
+        }
+
+        document.getElementById('postForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true; btn.innerText = "جاري الحفظ...";
+            
+            const p = {
+                productName: document.getElementById('productName').value,
+                date: document.getElementById('date').value,
+                day: new Date(document.getElementById('date').value).toLocaleDateString('ar-EG', {weekday: 'long'}),
+                contentType: document.getElementById('contentType').value,
+                occasion: document.getElementById('occasion').value,
+                captionDraft: document.getElementById('captionDraft').value,
+                mediaUrls: document.getElementById('mediaUrls').value
+            };
+
+            await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify(p) });
+            showToast("تم الحفظ بنجاح 🚀");
+            document.getElementById('postForm').reset();
+            btn.disabled = false; btn.innerText = "إضافة للجدول";
+            showTab('viewSection');
+        };
+
         fetchData();
+        lucide.createIcons();
     </script>
 </body>
 </html>
