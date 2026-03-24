@@ -14,7 +14,6 @@
         body.dark { background-color: #0b0f1a; color: #e2e8f0; }
         body.light { background-color: #f3f4f6; color: #1e293b; }
 
-        /* الكورسيل الاحترافي - العودة للتصميم السابق */
         .card { border-radius: 28px; overflow: hidden; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
         .dark .card { background: #161e2d; border: 1px solid #2d3748; }
         .light .card { background: #ffffff; border: 1px solid #e5e7eb; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
@@ -32,7 +31,6 @@
 
         .drive-btn { position: absolute; top: 15px; left: 15px; z-index: 30; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); padding: 10px; border-radius: 14px; color: white; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* شارة المناسبة */
         .occasion-badge { background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; padding: 5px 14px; border-radius: 10px; font-weight: 800; font-size: 11px; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); }
 
         #toast { position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: white; padding: 12px 28px; border-radius: 50px; font-size: 14px; opacity: 0; transition: 0.4s; z-index: 9999; }
@@ -85,11 +83,6 @@
         </div>
     </main>
 
-    <nav class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white/10 dark:bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[35px] p-2 flex justify-around shadow-2xl z-50">
-        <button onclick="showTab('viewSection')" class="p-5 text-indigo-500 transition"><i data-lucide="layout-grid"></i></button>
-        <button onclick="showTab('addSection')" class="p-5 text-gray-400 transition"><i data-lucide="plus-circle"></i></button>
-    </nav>
-
     <script>
         const API = 'https://script.google.com/macros/s/AKfycbznTvtaErEUBZpYduZj02LhTyWZtSjNd-mPYityXOyBdoBrsNh0ukPn5wKpAIS4L6iE/exec';
 
@@ -100,23 +93,11 @@
 
         function getMediaMeta(u) {
             const id = extractId(u);
-            const low = u.toLowerCase();
-            const isVid = low.includes('.mov') || low.includes('.mp4') || low.includes('video');
             return {
                 id: id,
-                type: isVid ? 'video' : 'img',
-                thumb: `https://drive.google.com/thumbnail?id=${id}&sz=w1000`,
                 preview: `https://drive.google.com/file/d/${id}/preview`,
                 direct: `https://drive.google.com/file/d/${id}/view`
             };
-        }
-
-        async function fetchData() {
-            try {
-                const r = await fetch(API);
-                const d = await r.json();
-                render(d.reverse());
-            } catch(e) { console.error("Sync Error"); }
         }
 
         function render(items) {
@@ -126,117 +107,22 @@
                 return `
                 <div class="card shadow-2xl">
                     <div class="media-wrapper">
-                        <div class="media-container" onscroll="const idx = Math.round(this.scrollLeft / this.offsetWidth); updateDots(this, Math.abs(idx))">
+                        <div class="media-container">
                             ${urls.map(u => {
                                 const m = getMediaMeta(u);
                                 return `
                                 <div class="media-item">
-                                    <a href="${m.direct}" target="_blank" class="drive-btn"><i data-lucide="external-link" class="w-5 h-5"></i></a>
-                                    ${m.type === 'video' ? 
-                                    `<iframe src="${m.preview}" class="w-full h-full"></iframe>` : 
-                                    `<img src="${m.thumb}" loading="lazy" class="w-full h-full object-cover">`}
+                                    <a href="${m.direct}" target="_blank" class="drive-btn">↗</a>
+                                    <iframe src="${m.preview}" class="w-full h-full"></iframe>
                                 </div>`;
                             }).join('')}
                         </div>
-                        ${urls.length > 1 ? `<div class="dots-container">${urls.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join('')}</div>` : ''}
-                    </div>
-                    
-                    <div class="p-6 space-y-5">
-                        <div class="flex justify-between items-start">
-                            <div class="space-y-1">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-sm font-black text-indigo-500">${item.date}</span>
-                                    <span class="text-[10px] opacity-40 uppercase font-black">${item.contentType}</span>
-                                </div>
-                                <h3 class="text-xl font-bold tracking-tight">${item.productName || 'بدون عنوان'}</h3>
-                            </div>
-                            <select onchange="updateStatus(${item.row_index}, this.value)" class="text-[11px] font-black p-2 px-4 rounded-xl border-none bg-gray-500/10 outline-none">
-                                <option ${item.status==='جديد'?'selected':''}>جديد</option>
-                                <option ${item.status==='قيد المراجعة'?'selected':''}>قيد المراجعة</option>
-                                <option ${item.status==='مقبول'?'selected':''}>مقبول</option>
-                                <option ${item.status==='مرفوض'?'selected':''}>مرفوض</option>
-                            </select>
-                        </div>
-
-                        ${item.occasion ? `<div class="occasion-badge"><i data-lucide="sparkles" class="w-3 h-3"></i> ${item.occasion}</div>` : ''}
-                        
-                        <p id="txt-${item.row_index}" class="text-sm opacity-70 leading-relaxed line-clamp-3 font-medium">${item.captionDraft || '...'}</p>
-                        
-                        <button onclick="copyCaption('${item.row_index}')" class="w-full bg-indigo-500/10 hover:bg-indigo-600 hover:text-white p-4 rounded-2xl text-xs font-black transition flex justify-center items-center gap-2">
-                            <i data-lucide="copy"></i> نسخ الكابشن بالكامل
-                        </button>
                     </div>
                 </div>`;
             }).join('');
-            lucide.createIcons();
         }
-
-        function updateDots(el, i) {
-            const ds = el.parentElement.querySelectorAll('.dot');
-            ds.forEach((d, idx) => d.classList.toggle('active', idx === i));
-        }
-
-        async function updateStatus(row, val) {
-            showToast("جاري التحديث...");
-            await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "updateStatus", row_index: row, newStatus: val }) });
-            showToast("تم تحديث الحالة ✅");
-        }
-
-        function copyCaption(rowId) {
-            const text = document.getElementById(`txt-${rowId}`).innerText;
-            const el = document.createElement('textarea');
-            el.value = text;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            showToast("تم النسخ للمحافظة ✨");
-        }
-
-        function showToast(m) {
-            const t = document.getElementById('toast');
-            t.innerText = m; t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2500);
-        }
-
-        function toggleTheme() {
-            const b = document.body;
-            b.classList.toggle('dark');
-            b.classList.toggle('light');
-            document.getElementById('themeIcon').setAttribute('data-lucide', b.classList.contains('dark') ? 'sun' : 'moon');
-            lucide.createIcons();
-        }
-
-        function showTab(id) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if(id === 'viewSection') fetchData();
-        }
-
-        document.getElementById('postForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.innerText = "SAVING...";
-            
-            const p = {
-                productName: document.getElementById('productName').value,
-                date: document.getElementById('date').value,
-                day: new Date(document.getElementById('date').value).toLocaleDateString('ar-EG', {weekday: 'long'}),
-                contentType: document.getElementById('contentType').value,
-                occasion: document.getElementById('occasion').value,
-                captionDraft: document.getElementById('captionDraft').value,
-                mediaUrls: document.getElementById('mediaUrls').value
-            };
-
-            await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify(p) });
-            showToast("تم الحفظ بنجاح 🚀");
-            document.getElementById('postForm').reset();
-            btn.disabled = false; btn.innerText = "Send to Sheet";
-            showTab('viewSection');
-        };
 
         fetchData();
-        lucide.createIcons();
     </script>
 </body>
 </html>
