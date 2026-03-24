@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Media Flow - Pro Edition</title>
+    <title>Media Flow - Ultimate App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -14,12 +14,12 @@
         body.dark { background-color: #0b0f1a; color: #e2e8f0; }
         body.light { background-color: #f3f4f6; color: #1e293b; }
 
-        /* الكورسيل الاحترافي - العودة للتصميم السابق */
         .card { border-radius: 28px; overflow: hidden; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
         .dark .card { background: #161e2d; border: 1px solid #2d3748; }
         .light .card { background: #ffffff; border: 1px solid #e5e7eb; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
 
-        .media-wrapper { position: relative; width: 100%; aspect-ratio: 1/1; background: #000; }
+        /* تغيير المقاس إلى 4:5 (1080x1350) */
+        .media-wrapper { position: relative; width: 100%; aspect-ratio: 4/5; background: #000; }
         .media-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; height: 100%; }
         .media-container::-webkit-scrollbar { display: none; }
         
@@ -30,29 +30,60 @@
         .dot { width: 6px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; }
         .dot.active { width: 18px; background: #fff; border-radius: 10px; }
 
-        .drive-btn { position: absolute; top: 15px; left: 15px; z-index: 30; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); padding: 10px; border-radius: 14px; color: white; border: 1px solid rgba(255,255,255,0.1); }
+        .drive-btn { position: absolute; top: 15px; left: 15px; z-index: 30; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); padding: 10px; border-radius: 14px; color: white; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
+        .drive-btn:active { transform: scale(0.9); }
 
-        /* شارة المناسبة */
         .occasion-badge { background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; padding: 5px 14px; border-radius: 10px; font-weight: 800; font-size: 11px; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); }
 
-        #toast { position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: white; padding: 12px 28px; border-radius: 50px; font-size: 14px; opacity: 0; transition: 0.4s; z-index: 9999; }
+        #toast { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: white; padding: 12px 28px; border-radius: 50px; font-size: 14px; opacity: 0; transition: 0.4s; z-index: 9999; }
         #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* القائمة الجانبية Sidebar */
+        #sidebarOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 60; opacity: 0; pointer-events: none; transition: 0.3s; }
+        #sidebarOverlay.active { opacity: 1; pointer-events: all; }
+        
+        #sidebar { position: fixed; top: 0; bottom: 0; right: -320px; width: 280px; z-index: 70; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -5px 0 25px rgba(0,0,0,0.5); padding: 24px; display: flex; flex-direction: column; gap: 15px; }
+        #sidebar.active { right: 0; }
+        .dark #sidebar { background: #0b0f1a; border-left: 1px solid #2d3748; }
+        .light #sidebar { background: #ffffff; border-left: 1px solid #e5e7eb; }
     </style>
 </head>
-<body class="dark pb-32">
+<body class="dark pb-10">
 
     <div id="toast">تم النسخ ✅</div>
 
-    <nav class="sticky top-0 z-50 p-4 flex justify-between items-center backdrop-blur-xl bg-inherit/70 border-b border-white/5">
+    <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div id="sidebar">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="font-black text-xl text-indigo-500 flex items-center gap-2"><i data-lucide="layout-grid"></i> القائمة</h2>
+            <button onclick="toggleSidebar()" class="p-2 bg-gray-500/10 rounded-xl active:scale-90 transition"><i data-lucide="x"></i></button>
+        </div>
+        
+        <button onclick="showTab('viewSection', 'active'); toggleSidebar()" class="w-full text-right p-4 rounded-xl hover:bg-indigo-500/10 active:bg-indigo-500/20 transition font-bold flex items-center gap-3">
+            <i data-lucide="clock" class="text-indigo-500"></i> المنشورات الحالية
+        </button>
+        
+        <button onclick="showTab('viewSection', 'accepted'); toggleSidebar()" class="w-full text-right p-4 rounded-xl hover:bg-green-500/10 active:bg-green-500/20 transition font-bold flex items-center gap-3">
+            <i data-lucide="check-circle" class="text-green-500"></i> المنشورات المقبولة
+        </button>
+        
+        <hr class="border-gray-500/20 my-2">
+        
+        <button onclick="showTab('addSection'); toggleSidebar()" class="w-full text-right p-4 rounded-xl hover:bg-amber-500/10 active:bg-amber-500/20 transition font-bold flex items-center gap-3">
+            <i data-lucide="plus-square" class="text-amber-500"></i> إضافة منشور جديد
+        </button>
+    </div>
+
+    <nav class="sticky top-0 z-50 p-4 flex justify-between items-center backdrop-blur-xl bg-inherit/70 border-b border-white/5 shadow-sm">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
-                <i data-lucide="layout-grid" class="w-6 h-6"></i>
-            </div>
-            <h1 class="font-black text-lg tracking-tight uppercase">Media Hub</h1>
+            <button onclick="toggleSidebar()" class="p-3 rounded-2xl bg-gray-500/10 active:scale-90 transition">
+                <i data-lucide="menu"></i>
+            </button>
+            <h1 id="pageTitle" class="font-black text-lg tracking-tight uppercase text-indigo-500">المنشورات الحالية</h1>
         </div>
         <div class="flex gap-2">
             <button onclick="toggleTheme()" class="p-3 rounded-2xl bg-gray-500/10 active:scale-90 transition"><i data-lucide="sun" id="themeIcon" class="text-amber-400"></i></button>
@@ -62,12 +93,13 @@
 
     <main class="max-w-xl mx-auto p-4">
         <div id="viewSection" class="tab-content active space-y-8">
-            <div id="contentContainer" class="grid grid-cols-1 gap-8"></div>
+            <div id="contentContainer" class="grid grid-cols-1 gap-8">
+                </div>
         </div>
 
         <div id="addSection" class="tab-content">
             <div class="card p-8 space-y-5">
-                <h2 class="text-2xl font-black italic">POST SOMETHING</h2>
+                <h2 class="text-2xl font-black italic">إضافة منشور جديد</h2>
                 <form id="postForm" class="space-y-4">
                     <input type="text" id="productName" placeholder="اسم المنتج/المنشور" class="w-full p-5 rounded-2xl bg-gray-500/5 border border-white/5 outline-none focus:ring-2 ring-indigo-500" required>
                     <div class="grid grid-cols-2 gap-4">
@@ -78,20 +110,21 @@
                     </div>
                     <input type="text" id="occasion" placeholder="مناسبة خاصة؟ (مثال: رمضان)" class="w-full p-5 rounded-2xl bg-gray-500/5 border border-white/5 outline-none">
                     <textarea id="captionDraft" placeholder="نص الكابشن..." class="w-full p-5 rounded-2xl bg-gray-500/5 border border-white/5 h-40 outline-none"></textarea>
-                    <textarea id="mediaUrls" placeholder="روابط جوجل درايف (افصل بـ |||)" class="w-full p-4 rounded-2xl bg-gray-500/5 border border-white/5 h-24 outline-none text-xs"></textarea>
-                    <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-black p-5 rounded-2xl shadow-xl active:scale-95 transition uppercase tracking-widest">Send to Sheet</button>
+                    <textarea id="mediaUrls" placeholder="روابط جوجل درايف (افصل بـ |||)" class="w-full p-4 rounded-2xl bg-gray-500/5 border border-white/5 h-24 outline-none text-xs" dir="ltr"></textarea>
+                    <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-black p-5 rounded-2xl shadow-xl active:scale-95 transition tracking-widest">إرسال للجدول</button>
                 </form>
             </div>
         </div>
     </main>
 
-    <nav class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white/10 dark:bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[35px] p-2 flex justify-around shadow-2xl z-50">
-        <button onclick="showTab('viewSection')" class="p-5 text-indigo-500 transition"><i data-lucide="layout-grid"></i></button>
-        <button onclick="showTab('addSection')" class="p-5 text-gray-400 transition"><i data-lucide="plus-circle"></i></button>
-    </nav>
-
     <script>
         const API = 'https://script.google.com/macros/s/AKfycbwgvI6uH2J9aKpLw9ALrVxZyh8l3mKDgyMlyGbprJSa6ZbrVp8XdEGHHZWOver2Y1mL6Q/exec';
+        
+        // 🔴 ضع رابط جوجل شيت الخاص بك هنا 🔴
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1nmUi27e9dMHuld2TnTFeuG5yLX4xfAz9utPZscl__Cw/edit?gid=0#gid=0'; 
+
+        let allPostsData = [];
+        let currentFilter = 'active'; // 'active' للمنشورات الحالية, 'accepted' للمقبولة
 
         function extractId(u) {
             const m = u.match(/(?:id=|\/d\/|preview\/d\/)([\w-]{25,})/);
@@ -111,16 +144,65 @@
             };
         }
 
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
         async function fetchData() {
             try {
                 const r = await fetch(API);
                 const d = await r.json();
-                render(d.reverse());
-            } catch(e) { console.error("Sync Error"); }
+                
+                // 1- تنظيف البيانات: فلترة الصفوف الفارغة تماماً
+                allPostsData = d.filter(item => {
+                    const hasName = item.productName && item.productName.trim() !== '';
+                    const hasDate = item.date && item.date.trim() !== '';
+                    const hasMedia = item.mediaUrls && item.mediaUrls.trim() !== '';
+                    return hasName || hasDate || hasMedia;
+                });
+
+                // 2- الفرز الزمني: من الأقدم للأحدث
+                allPostsData.sort((a, b) => {
+                    const dateA = new Date(a.date || 0);
+                    const dateB = new Date(b.date || 0);
+                    return dateA - dateB;
+                });
+
+                renderCurrentView();
+            } catch(e) { console.error("Sync Error"); showToast("خطأ في جلب البيانات"); }
+        }
+
+        function renderCurrentView() {
+            let filteredItems = [];
+            
+            if (currentFilter === 'accepted') {
+                filteredItems = allPostsData.filter(item => item.status === 'مقبول');
+                document.getElementById('pageTitle').innerText = "المنشورات المقبولة";
+                document.getElementById('pageTitle').className = "font-black text-lg tracking-tight text-green-500";
+            } else {
+                filteredItems = allPostsData.filter(item => item.status !== 'مقبول');
+                document.getElementById('pageTitle').innerText = "المنشورات الحالية";
+                document.getElementById('pageTitle').className = "font-black text-lg tracking-tight text-indigo-500";
+            }
+
+            render(filteredItems);
         }
 
         function render(items) {
             const container = document.getElementById('contentContainer');
+            
+            // حالة عدم وجود بيانات
+            if(items.length === 0) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-20 opacity-40">
+                        <i data-lucide="inbox" class="w-20 h-20 mb-4"></i>
+                        <p class="font-bold text-lg">لا توجد منشورات في هذا القسم</p>
+                    </div>`;
+                lucide.createIcons();
+                return;
+            }
+
             container.innerHTML = items.map(item => {
                 const urls = item.mediaUrls ? item.mediaUrls.split('|||').filter(x => x.trim()) : [];
                 return `
@@ -139,31 +221,38 @@
                             }).join('')}
                         </div>
                         ${urls.length > 1 ? `<div class="dots-container">${urls.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join('')}</div>` : ''}
+                        ${urls.length === 0 ? `<div class="absolute inset-0 flex items-center justify-center bg-gray-900"><i data-lucide="image-off" class="text-gray-600 w-10 h-10"></i></div>` : ''}
                     </div>
                     
                     <div class="p-6 space-y-5">
                         <div class="flex justify-between items-start">
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-sm font-black text-indigo-500">${item.date}</span>
-                                    <span class="text-[10px] opacity-40 uppercase font-black">${item.contentType}</span>
+                                    <span class="text-sm font-black text-indigo-500">${item.date || 'بدون تاريخ'}</span>
+                                    <span class="text-[10px] opacity-40 uppercase font-black">${item.contentType || ''}</span>
                                 </div>
                                 <h3 class="text-xl font-bold tracking-tight">${item.productName || 'بدون عنوان'}</h3>
                             </div>
-                            <select onchange="updateStatus(${item.row_index}, this.value)" class="text-[11px] font-black p-2 px-4 rounded-xl border-none bg-gray-500/10 outline-none">
-                                <option ${item.status==='جديد'?'selected':''}>جديد</option>
-                                <option ${item.status==='قيد المراجعة'?'selected':''}>قيد المراجعة</option>
-                                <option ${item.status==='مقبول'?'selected':''}>مقبول</option>
-                                <option ${item.status==='مرفوض'?'selected':''}>مرفوض</option>
-                            </select>
+                            
+                            <div class="flex flex-col items-end gap-2">
+                                <select onchange="updateStatus(${item.row_index}, this.value)" class="text-[11px] font-black p-2 px-4 rounded-xl border-none bg-gray-500/10 outline-none cursor-pointer text-center">
+                                    <option ${item.status==='جديد'?'selected':''}>جديد</option>
+                                    <option ${item.status==='قيد المراجعة'?'selected':''}>قيد المراجعة</option>
+                                    <option ${item.status==='مقبول'?'selected':''}>مقبول</option>
+                                    <option ${item.status==='مرفوض'?'selected':''}>مرفوض</option>
+                                </select>
+                                <a href="${SHEET_URL}" target="_blank" class="text-[10px] font-bold py-1.5 px-3 rounded-lg bg-green-500/10 text-green-500 hover:bg-green-500/20 transition flex items-center gap-1">
+                                    <i data-lucide="table" class="w-3 h-3"></i> فتح بالشيت
+                                </a>
+                            </div>
                         </div>
 
                         ${item.occasion ? `<div class="occasion-badge"><i data-lucide="sparkles" class="w-3 h-3"></i> ${item.occasion}</div>` : ''}
                         
-                        <p id="txt-${item.row_index}" class="text-sm opacity-70 leading-relaxed line-clamp-3 font-medium">${item.captionDraft || '...'}</p>
+                        <p id="txt-${item.row_index}" class="text-sm opacity-70 leading-relaxed line-clamp-3 font-medium whitespace-pre-wrap">${item.captionDraft || '...'}</p>
                         
-                        <button onclick="copyCaption('${item.row_index}')" class="w-full bg-indigo-500/10 hover:bg-indigo-600 hover:text-white p-4 rounded-2xl text-xs font-black transition flex justify-center items-center gap-2">
-                            <i data-lucide="copy"></i> نسخ الكابشن بالكامل
+                        <button onclick="copyCaption('${item.row_index}')" class="w-full bg-indigo-500/10 hover:bg-indigo-600 hover:text-white p-4 rounded-2xl text-xs font-black transition flex justify-center items-center gap-2 active:scale-95">
+                            <i data-lucide="copy" class="w-4 h-4"></i> نسخ الكابشن بالكامل
                         </button>
                     </div>
                 </div>`;
@@ -177,9 +266,16 @@
         }
 
         async function updateStatus(row, val) {
-            showToast("جاري التحديث...");
+            // تحديث محلي سريع لإخفاء الكارد فوراً إذا تحول لمقبول
+            const itemIndex = allPostsData.findIndex(i => i.row_index === row);
+            if(itemIndex > -1) {
+                allPostsData[itemIndex].status = val;
+            }
+            renderCurrentView(); // إعادة الرسم فورا لإخفاء المنشور
+            showToast("تم نقل المنشور بنجاح ✅");
+
+            // إرسال الطلب لـ API في الخلفية
             await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "updateStatus", row_index: row, newStatus: val }) });
-            showToast("تم تحديث الحالة ✅");
         }
 
         function copyCaption(rowId) {
@@ -207,16 +303,23 @@
             lucide.createIcons();
         }
 
-        function showTab(id) {
+        function showTab(id, filter = 'active') {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(id === 'viewSection') fetchData();
+            
+            if(id === 'viewSection') {
+                currentFilter = filter;
+                renderCurrentView();
+            } else if (id === 'addSection') {
+                document.getElementById('pageTitle').innerText = "إضافة منشور";
+                document.getElementById('pageTitle').className = "font-black text-lg tracking-tight text-amber-500";
+            }
         }
 
         document.getElementById('postForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.innerText = "SAVING...";
+            btn.disabled = true; btn.innerText = "جاري الحفظ...";
             
             const p = {
                 productName: document.getElementById('productName').value,
@@ -231,10 +334,14 @@
             await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify(p) });
             showToast("تم الحفظ بنجاح 🚀");
             document.getElementById('postForm').reset();
-            btn.disabled = false; btn.innerText = "Send to Sheet";
-            showTab('viewSection');
+            btn.disabled = false; btn.innerText = "إرسال للجدول";
+            
+            // تحديث البيانات وعرض المنشورات الحالية
+            fetchData();
+            showTab('viewSection', 'active');
         };
 
+        // التهيئة
         fetchData();
         lucide.createIcons();
     </script>
