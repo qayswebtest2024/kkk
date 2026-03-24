@@ -3,44 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Media Flow Final Pro</title>
+    <title>Media Flow - Pro Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --p: #6366f1; }
-        body { font-family: 'Tajawal', sans-serif; transition: background 0.4s ease, color 0.4s ease; }
+        body { font-family: 'Tajawal', sans-serif; transition: background 0.4s, color 0.4s; overflow-x: hidden; }
         
         body.dark { background-color: #0b0f1a; color: #e2e8f0; }
         body.light { background-color: #f3f4f6; color: #1e293b; }
 
-        .card { border-radius: 28px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; position: relative; }
+        /* الكورسيل الاحترافي - العودة للتصميم السابق */
+        .card { border-radius: 28px; overflow: hidden; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
         .dark .card { background: #161e2d; border: 1px solid #2d3748; }
-        .light .card { background: #ffffff; border: 1px solid #e5e7eb; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+        .light .card { background: #ffffff; border: 1px solid #e5e7eb; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
 
-        /* ميديا كورسيل */
-        .media-wrapper { position: relative; overflow: hidden; }
-        .media-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .media-wrapper { position: relative; width: 100%; aspect-ratio: 1/1; background: #000; }
+        .media-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; height: 100%; }
         .media-container::-webkit-scrollbar { display: none; }
-        .media-item { flex: 0 0 100%; scroll-snap-align: start; aspect-ratio: 1/1; position: relative; background: #000; }
         
-        /* زر درايف على الميديا */
-        .drive-link { position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); padding: 8px; border-radius: 12px; color: white; border: 1px solid rgba(255,255,255,0.2); transition: 0.2s; }
-        .drive-link:active { transform: scale(0.9); }
+        .media-item { flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
+        .media-item img, .media-item iframe { width: 100%; height: 100%; object-fit: cover; border: none; }
 
-        .dots-container { position: absolute; bottom: 15px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px; z-index: 10; pointer-events: none; }
-        .dot { width: 5px; height: 5px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; }
-        .dot.active { width: 15px; background: #fff; border-radius: 10px; }
+        .dots-container { position: absolute; bottom: 15px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px; z-index: 20; pointer-events: none; }
+        .dot { width: 6px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; }
+        .dot.active { width: 18px; background: #fff; border-radius: 10px; }
+
+        .drive-btn { position: absolute; top: 15px; left: 15px; z-index: 30; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); padding: 10px; border-radius: 14px; color: white; border: 1px solid rgba(255,255,255,0.1); }
 
         /* شارة المناسبة */
-        .occasion-badge { background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+        .occasion-badge { background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; padding: 5px 14px; border-radius: 10px; font-weight: 800; font-size: 11px; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); }
 
-        #toast { position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: white; padding: 12px 24px; border-radius: 50px; font-size: 14px; opacity: 0; transition: 0.4s ease; z-index: 1000; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        #toast { position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: white; padding: 12px 28px; border-radius: 50px; font-size: 14px; opacity: 0; transition: 0.4s; z-index: 9999; }
         #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: zoomIn 0.3s ease; }
-        @keyframes zoomIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="dark pb-32">
@@ -49,101 +49,74 @@
 
     <nav class="sticky top-0 z-50 p-4 flex justify-between items-center backdrop-blur-xl bg-inherit/70 border-b border-white/5">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
-                <i data-lucide="layout-template" class="w-6 h-6"></i>
+            <div class="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                <i data-lucide="layout-grid" class="w-6 h-6"></i>
             </div>
-            <div>
-                <h1 class="font-black text-sm tracking-widest uppercase">Media Hub</h1>
-                <p id="syncTime" class="text-[9px] opacity-40">جاري المزامنة...</p>
-            </div>
+            <h1 class="font-black text-lg tracking-tight uppercase">Media Hub</h1>
         </div>
         <div class="flex gap-2">
-            <button onclick="toggleTheme()" class="p-3 rounded-2xl bg-gray-500/10 transition active:scale-90">
-                <i data-lucide="sun" id="themeIcon" class="w-5 h-5 text-amber-400"></i>
-            </button>
-            <button onclick="fetchData()" class="p-3 rounded-2xl bg-indigo-500/10 text-indigo-500 transition active:scale-90">
-                <i data-lucide="refresh-cw" class="w-5 h-5"></i>
-            </button>
+            <button onclick="toggleTheme()" class="p-3 rounded-2xl bg-gray-500/10 active:scale-90 transition"><i data-lucide="sun" id="themeIcon" class="text-amber-400"></i></button>
+            <button onclick="fetchData()" class="p-3 rounded-2xl bg-indigo-500/10 text-indigo-500 active:scale-90 transition"><i data-lucide="refresh-cw"></i></button>
         </div>
     </nav>
 
     <main class="max-w-xl mx-auto p-4">
         <div id="viewSection" class="tab-content active space-y-8">
-            <div id="contentContainer" class="grid grid-cols-1 gap-8">
-                </div>
+            <div id="contentContainer" class="grid grid-cols-1 gap-8"></div>
         </div>
 
         <div id="addSection" class="tab-content">
             <div class="card p-8 space-y-5">
-                <h2 class="text-2xl font-black">إضافة محتوى</h2>
+                <h2 class="text-2xl font-black italic">POST SOMETHING</h2>
                 <form id="postForm" class="space-y-4">
-                    <input type="text" id="productName" placeholder="عنوان المنشور" class="w-full p-4 rounded-2xl bg-gray-500/5 border border-white/5 outline-none focus:ring-2 ring-indigo-500 transition" required>
-                    <div class="grid grid-cols-2 gap-3">
-                        <input type="date" id="date" class="p-4 rounded-2xl bg-gray-500/5 border border-white/5 outline-none" required>
-                        <select id="contentType" class="p-4 rounded-2xl bg-gray-500/5 border border-white/5 outline-none font-bold">
-                            <option>ريل</option>
-                            <option>بوست</option>
-                            <option>ستوري</option>
+                    <input type="text" id="productName" placeholder="اسم المنتج/المنشور" class="w-full p-5 rounded-2xl bg-gray-500/5 border border-white/5 outline-none focus:ring-2 ring-indigo-500" required>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="date" id="date" class="p-5 rounded-2xl bg-gray-500/5 border border-white/5 outline-none" required>
+                        <select id="contentType" class="p-5 rounded-2xl bg-gray-500/5 border border-white/5 outline-none font-bold">
+                            <option>ريل</option><option>بوست</option><option>ستوري</option>
                         </select>
                     </div>
-                    <input type="text" id="occasion" placeholder="مناسبة خاصة (مثال: رمضان، عرض خاص)" class="w-full p-4 rounded-2xl bg-gray-500/5 border border-white/5 outline-none">
-                    <textarea id="captionDraft" placeholder="نص الكابشن..." class="w-full p-4 rounded-2xl bg-gray-500/5 border border-white/5 h-32 outline-none"></textarea>
-                    <textarea id="mediaUrls" placeholder="روابط جوجل درايف (افصل بـ |||)" class="w-full p-4 rounded-2xl bg-gray-500/5 border border-white/5 h-20 outline-none text-xs"></textarea>
-                    <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-black p-5 rounded-2xl shadow-xl shadow-indigo-500/20 active:scale-95 transition">نشر في الجدول</button>
+                    <input type="text" id="occasion" placeholder="مناسبة خاصة؟ (مثال: رمضان)" class="w-full p-5 rounded-2xl bg-gray-500/5 border border-white/5 outline-none">
+                    <textarea id="captionDraft" placeholder="نص الكابشن..." class="w-full p-5 rounded-2xl bg-gray-500/5 border border-white/5 h-40 outline-none"></textarea>
+                    <textarea id="mediaUrls" placeholder="روابط جوجل درايف (افصل بـ |||)" class="w-full p-4 rounded-2xl bg-gray-500/5 border border-white/5 h-24 outline-none text-xs"></textarea>
+                    <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-black p-5 rounded-2xl shadow-xl active:scale-95 transition uppercase tracking-widest">Send to Sheet</button>
                 </form>
             </div>
         </div>
     </main>
 
-    <nav class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white/10 dark:bg-gray-900/40 backdrop-blur-3xl border border-white/10 rounded-[35px] p-2 flex justify-around shadow-2xl z-50">
-        <button onclick="showTab('viewSection')" class="nav-btn p-5 text-indigo-500 transition-all">
-            <i data-lucide="layout-grid" class="w-6 h-6"></i>
-        </button>
-        <button onclick="showTab('addSection')" class="nav-btn p-5 text-gray-500 transition-all">
-            <i data-lucide="plus-circle" class="w-6 h-6"></i>
-        </button>
+    <nav class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white/10 dark:bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[35px] p-2 flex justify-around shadow-2xl z-50">
+        <button onclick="showTab('viewSection')" class="p-5 text-indigo-500 transition"><i data-lucide="layout-grid"></i></button>
+        <button onclick="showTab('addSection')" class="p-5 text-gray-400 transition"><i data-lucide="plus-circle"></i></button>
     </nav>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxVfPtEk_Rd35yGbvoBpNzrcc1K_D3f3vs73BJtuekHlKnOgefFWV85-XJ6noQG4GIa/exec';
-        
-        function toggleTheme() {
-            const b = document.body;
-            const i = document.getElementById('themeIcon');
-            if(b.classList.contains('dark')) {
-                b.classList.replace('dark', 'light');
-                i.setAttribute('data-lucide', 'moon');
-            } else {
-                b.classList.replace('light', 'dark');
-                i.setAttribute('data-lucide', 'sun');
-            }
-            lucide.createIcons();
+        const API = 'https://script.google.com/macros/s/AKfycbznTvtaErEUBZpYduZj02LhTyWZtSjNd-mPYityXOyBdoBrsNh0ukPn5wKpAIS4L6iE/exec';
+
+        function extractId(u) {
+            const m = u.match(/(?:id=|\/d\/|preview\/d\/)([\w-]{25,})/);
+            return m ? m[1] : u.trim();
         }
 
-        function extractId(url) {
-            const m = url.match(/(?:id=|\/d\/|preview\/d\/)([\w-]{25,})/);
-            return m ? m[1] : url.trim();
-        }
-
-        function getMediaMeta(url) {
-            const id = extractId(url);
-            const isVid = url.toLowerCase().includes('.mov') || url.toLowerCase().includes('.mp4');
+        function getMediaMeta(u) {
+            const id = extractId(u);
+            const low = u.toLowerCase();
+            const isVid = low.includes('.mov') || low.includes('.mp4') || low.includes('video');
             return {
+                id: id,
+                type: isVid ? 'video' : 'img',
                 thumb: `https://drive.google.com/thumbnail?id=${id}&sz=w1000`,
                 preview: `https://drive.google.com/file/d/${id}/preview`,
-                original: `https://drive.google.com/file/d/${id}/view`,
-                type: isVid ? 'video' : 'img'
+                direct: `https://drive.google.com/file/d/${id}/view`
             };
         }
 
         async function fetchData() {
-            document.getElementById('syncTime').innerText = "جاري التحديث...";
             try {
-                const r = await fetch(API_URL);
+                const r = await fetch(API);
                 const d = await r.json();
                 render(d.reverse());
-                document.getElementById('syncTime').innerText = "محدث: " + new Date().toLocaleTimeString('ar-EG');
-            } catch(e) { document.getElementById('syncTime').innerText = "فشل الاتصال"; }
+            } catch(e) { console.error("Sync Error"); }
         }
 
         function render(items) {
@@ -151,35 +124,33 @@
             container.innerHTML = items.map(item => {
                 const urls = item.mediaUrls ? item.mediaUrls.split('|||').filter(x => x.trim()) : [];
                 return `
-                <div class="card">
+                <div class="card shadow-2xl">
                     <div class="media-wrapper">
                         <div class="media-container" onscroll="const idx = Math.round(this.scrollLeft / this.offsetWidth); updateDots(this, Math.abs(idx))">
                             ${urls.map(u => {
                                 const m = getMediaMeta(u);
                                 return `
                                 <div class="media-item">
-                                    <a href="${m.original}" target="_blank" class="drive-link">
-                                        <i data-lucide="external-link" class="w-4 h-4"></i>
-                                    </a>
+                                    <a href="${m.direct}" target="_blank" class="drive-btn"><i data-lucide="external-link" class="w-5 h-5"></i></a>
                                     ${m.type === 'video' ? 
-                                    `<iframe src="${m.preview}" class="w-full h-full border-none pointer-events-none"></iframe>` : 
-                                    `<img src="${m.thumb}" class="w-full h-full object-cover">`}
+                                    `<iframe src="${m.preview}" class="w-full h-full"></iframe>` : 
+                                    `<img src="${m.thumb}" loading="lazy" class="w-full h-full object-cover">`}
                                 </div>`;
                             }).join('')}
                         </div>
                         ${urls.length > 1 ? `<div class="dots-container">${urls.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join('')}</div>` : ''}
                     </div>
                     
-                    <div class="p-6 space-y-4">
+                    <div class="p-6 space-y-5">
                         <div class="flex justify-between items-start">
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-sm font-black text-indigo-500 dark:text-indigo-400">${item.date}</span>
-                                    <span class="text-[10px] opacity-40 uppercase font-bold tracking-tighter">${item.contentType}</span>
+                                    <span class="text-sm font-black text-indigo-500">${item.date}</span>
+                                    <span class="text-[10px] opacity-40 uppercase font-black">${item.contentType}</span>
                                 </div>
-                                <h3 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">${item.productName || 'بدون عنوان'}</h3>
+                                <h3 class="text-xl font-bold tracking-tight">${item.productName || 'بدون عنوان'}</h3>
                             </div>
-                            <select onchange="updateStatus(${item.row_index}, this.value)" class="text-[10px] font-black py-2 px-4 rounded-xl border-none bg-gray-500/10 outline-none">
+                            <select onchange="updateStatus(${item.row_index}, this.value)" class="text-[11px] font-black p-2 px-4 rounded-xl border-none bg-gray-500/10 outline-none">
                                 <option ${item.status==='جديد'?'selected':''}>جديد</option>
                                 <option ${item.status==='قيد المراجعة'?'selected':''}>قيد المراجعة</option>
                                 <option ${item.status==='مقبول'?'selected':''}>مقبول</option>
@@ -187,16 +158,12 @@
                             </select>
                         </div>
 
-                        ${item.occasion ? `
-                        <div class="occasion-badge">
-                            <i data-lucide="sparkles" class="w-3 h-3"></i>
-                            ${item.occasion}
-                        </div>` : ''}
+                        ${item.occasion ? `<div class="occasion-badge"><i data-lucide="sparkles" class="w-3 h-3"></i> ${item.occasion}</div>` : ''}
                         
-                        <p class="text-sm opacity-70 leading-relaxed line-clamp-3 font-medium">${item.captionDraft || 'لا يوجد وصف متاح لهذا المنشور'}</p>
+                        <p id="txt-${item.row_index}" class="text-sm opacity-70 leading-relaxed line-clamp-3 font-medium">${item.captionDraft || '...'}</p>
                         
-                        <button onclick="copyDraft('${item.captionDraft}')" class="w-full bg-gray-500/10 hover:bg-indigo-600 hover:text-white p-4 rounded-2xl text-xs font-black transition-all flex justify-center items-center gap-2 border border-transparent active:scale-95">
-                            <i data-lucide="copy-check" class="w-4 h-4"></i> نسخ النص بالكامل
+                        <button onclick="copyCaption('${item.row_index}')" class="w-full bg-indigo-500/10 hover:bg-indigo-600 hover:text-white p-4 rounded-2xl text-xs font-black transition flex justify-center items-center gap-2">
+                            <i data-lucide="copy"></i> نسخ الكابشن بالكامل
                         </button>
                     </div>
                 </div>`;
@@ -204,26 +171,40 @@
             lucide.createIcons();
         }
 
-        async function updateStatus(row, status) {
-            showToast("جاري التحديث...");
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "updateStatus", row_index: row, newStatus: status }) });
-            showToast("تم تحديث الحالة ✅");
-        }
-
         function updateDots(el, i) {
             const ds = el.parentElement.querySelectorAll('.dot');
             ds.forEach((d, idx) => d.classList.toggle('active', idx === i));
         }
 
-        function copyDraft(t) {
-            navigator.clipboard.writeText(t);
-            showToast("تم نسخ الكابشن بنجاح! ✨");
+        async function updateStatus(row, val) {
+            showToast("جاري التحديث...");
+            await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "updateStatus", row_index: row, newStatus: val }) });
+            showToast("تم تحديث الحالة ✅");
+        }
+
+        function copyCaption(rowId) {
+            const text = document.getElementById(`txt-${rowId}`).innerText;
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showToast("تم النسخ للمحافظة ✨");
         }
 
         function showToast(m) {
             const t = document.getElementById('toast');
             t.innerText = m; t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        function toggleTheme() {
+            const b = document.body;
+            b.classList.toggle('dark');
+            b.classList.toggle('light');
+            document.getElementById('themeIcon').setAttribute('data-lucide', b.classList.contains('dark') ? 'sun' : 'moon');
+            lucide.createIcons();
         }
 
         function showTab(id) {
@@ -234,8 +215,8 @@
 
         document.getElementById('postForm').onsubmit = async (e) => {
             e.preventDefault();
-            const b = document.getElementById('submitBtn');
-            b.disabled = true; b.innerText = "جاري الحفظ...";
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true; btn.innerText = "SAVING...";
             
             const p = {
                 productName: document.getElementById('productName').value,
@@ -247,10 +228,10 @@
                 mediaUrls: document.getElementById('mediaUrls').value
             };
 
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(p) });
-            showToast("تم الإرسال للجدول 🚀");
+            await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify(p) });
+            showToast("تم الحفظ بنجاح 🚀");
             document.getElementById('postForm').reset();
-            b.disabled = false; b.innerText = "نشر في الجدول";
+            btn.disabled = false; btn.innerText = "Send to Sheet";
             showTab('viewSection');
         };
 
