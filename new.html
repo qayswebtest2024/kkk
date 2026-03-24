@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Media Flow - Ultimate Fix</title>
+    <title>Media Flow - Final Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -66,7 +66,7 @@
 
         <div id="addSection" class="tab-content">
             <div class="card p-8 space-y-5">
-                <h2 class="text-2xl font-black italic">POST SOMETHING</h2>
+                <h2 class="text-2xl font-black italic">نشر محتوى جديد</h2>
                 <form id="postForm" class="space-y-4">
                     <input type="text" id="productName" placeholder="اسم المنتج/المنشور" class="w-full p-5 rounded-2xl bg-gray-500/5 border border-white/5 outline-none focus:ring-2 ring-indigo-500" required>
                     <div class="grid grid-cols-2 gap-4">
@@ -75,12 +75,12 @@
                             <option>ريل</option><option>بوست</option><option>ستوري</option>
                         </select>
                     </div>
-                    <input type="text" id="occasion" placeholder="مناسبة خاصة؟ (مثال: رمضان)" class="w-full p-5 rounded-2xl bg-gray-500/5 border border-white/5 outline-none">
+                    <input type="text" id="occasion" placeholder="مناسبة خاصة؟ (مثال: رمضان، عرض خاص)" class="w-full p-5 rounded-2xl bg-gray-500/5 border border-white/5 outline-none">
                     <textarea id="captionDraft" placeholder="نص الكابشن..." class="w-full p-5 rounded-2xl bg-gray-500/5 border border-white/5 h-40 outline-none"></textarea>
                     
                     <div class="space-y-1">
-                        <label class="text-xs font-bold opacity-60 px-2">روابط جوجل درايف (ضع كل رابط في سطر)</label>
-                        <textarea id="mediaUrls" placeholder="الصق الرابط الأول هنا...&#10;الصق الرابط الثاني في سطر جديد..." class="w-full p-4 rounded-2xl bg-gray-500/5 border border-white/5 h-28 outline-none text-xs" dir="ltr"></textarea>
+                        <label class="text-xs font-bold opacity-60 px-2">روابط الميديا (درايف)</label>
+                        <textarea id="mediaUrls" placeholder="انسخ الروابط هنا... يمكنك وضع كل رابط في سطر جديد" class="w-full p-4 rounded-2xl bg-gray-500/5 border border-white/5 h-28 outline-none text-xs" dir="ltr"></textarea>
                     </div>
                     
                     <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-black p-5 rounded-2xl shadow-xl active:scale-95 transition uppercase tracking-widest">إضافة للجدول</button>
@@ -95,22 +95,20 @@
     </nav>
 
     <script>
-        const API = 'https://script.google.com/macros/s/AKfycbznTvtaErEUBZpYduZj02LhTyWZtSjNd-mPYityXOyBdoBrsNh0ukPn5wKpAIS4L6iE/exec
-';
+        // تم وضع الـ API الخاص بك هنا مباشرة
+        const API = 'https://script.google.com/macros/s/AKfycbznTvtaErEUBZpYduZj02LhTyWZtSjNd-mPYityXOyBdoBrsNh0ukPn5wKpAIS4L6iE/exec';
 
-        // محرك ذكي لاستخراج ID درايف من أي نص 
+        // محرك استخراج المعرف الذكي يدعم أي صيغة من جوجل درايف
         function extractId(url) {
             if (!url) return '';
             const match = url.match(/[-\w]{25,}/); 
             return match ? match[0] : url.trim();
         }
 
-        // إعداد بيانات الميديا مع نظام احتياطي للفشل
         function getMediaMeta(u) {
             const id = extractId(u);
             return {
                 thumb: `https://drive.google.com/thumbnail?id=${id}&sz=w1000`,
-                // صورة بديلة في حال كان الفيديو قيد المعالجة من جوجل أو الرابط غير مدعوم للمعاينه المباشره
                 fallback: `https://ui-avatars.com/api/?name=Media+File&background=1e293b&color=fff&size=512&font-size=0.1`,
                 direct: `https://drive.google.com/file/d/${id}/view`
             };
@@ -121,14 +119,24 @@
                 const r = await fetch(API);
                 const d = await r.json();
                 render(d.reverse());
-            } catch(e) { console.error("Sync Error"); }
+            } catch(e) { console.error("Sync Error", e); showToast("خطأ في الاتصال"); }
         }
 
         function render(items) {
             const container = document.getElementById('contentContainer');
             container.innerHTML = items.map(item => {
-                // الحل الجذري: تقسيم الروابط بناءً على المسافات، الأسطر الجديدة (Enter)، أو |||
-                const rawUrls = item.mediaUrls ? item.mediaUrls.split(/(?:\|\|\||\r?\n|,)/) : [];
+                // حماية إضافية للتعامل مع الأعمدة سواء كانت بالإنجليزية أو العربية
+                const mediaStr = item.mediaUrls || item['روابط_الميديا'] || '';
+                const prodName = item.productName || item['اسم_المنتج'] || 'بدون عنوان';
+                const dateStr = item.date || item['التاريخ'] || '';
+                const cType = item.contentType || item['نوع_المحتوى'] || '';
+                const stat = item.status || item['الحالة'] || 'جديد';
+                const occ = item.occasion || item['المناسبة'] || '';
+                const caption = item.captionDraft || item['الكابشن_المبدئي'] || '';
+                const rowIdx = item.row_index || item['row_index'] || 2;
+
+                // تقسيم الروابط بذكاء
+                const rawUrls = mediaStr ? String(mediaStr).split(/(?:\|\|\||\r?\n|,)/) : [];
                 const urls = rawUrls.map(u => u.trim()).filter(u => u.length > 15);
 
                 return `
@@ -154,24 +162,24 @@
                         <div class="flex justify-between items-start">
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-sm font-black text-indigo-500">${item.date}</span>
-                                    <span class="text-[10px] opacity-40 uppercase font-black">${item.contentType}</span>
+                                    <span class="text-sm font-black text-indigo-500">${dateStr}</span>
+                                    <span class="text-[10px] opacity-40 uppercase font-black">${cType}</span>
                                 </div>
-                                <h3 class="text-xl font-bold tracking-tight">${item.productName || 'بدون عنوان'}</h3>
+                                <h3 class="text-xl font-bold tracking-tight">${prodName}</h3>
                             </div>
-                            <select onchange="updateStatus(${item.row_index}, this.value)" class="text-[11px] font-black p-2 px-4 rounded-xl border-none bg-gray-500/10 outline-none cursor-pointer">
-                                <option ${item.status==='جديد'?'selected':''}>جديد</option>
-                                <option ${item.status==='قيد المراجعة'?'selected':''}>قيد المراجعة</option>
-                                <option ${item.status==='مقبول'?'selected':''}>مقبول</option>
-                                <option ${item.status==='مرفوض'?'selected':''}>مرفوض</option>
+                            <select onchange="updateStatus(${rowIdx}, this.value)" class="text-[11px] font-black p-2 px-4 rounded-xl border-none bg-gray-500/10 outline-none cursor-pointer">
+                                <option ${stat==='جديد'?'selected':''}>جديد</option>
+                                <option ${stat==='مراجعة' || stat==='قيد المراجعة' ?'selected':''}>قيد المراجعة</option>
+                                <option ${stat==='مقبول'?'selected':''}>مقبول</option>
+                                <option ${stat==='مرفوض'?'selected':''}>مرفوض</option>
                             </select>
                         </div>
 
-                        ${item.occasion ? `<div class="occasion-badge"><i data-lucide="sparkles" class="w-3 h-3"></i> ${item.occasion}</div>` : ''}
+                        ${occ && occ !== 'لايوجد' ? `<div class="occasion-badge"><i data-lucide="sparkles" class="w-3 h-3"></i> ${occ}</div>` : ''}
                         
-                        <p id="txt-${item.row_index}" class="text-sm opacity-70 leading-relaxed line-clamp-3 font-medium whitespace-pre-wrap">${item.captionDraft || '...'}</p>
+                        <p id="txt-${rowIdx}" class="text-sm opacity-70 leading-relaxed line-clamp-3 font-medium whitespace-pre-wrap">${caption}</p>
                         
-                        <button onclick="copyCaption('${item.row_index}')" class="w-full bg-indigo-500/10 hover:bg-indigo-600 hover:text-white p-4 rounded-2xl text-xs font-black transition flex justify-center items-center gap-2">
+                        <button onclick="copyCaption('${rowIdx}')" class="w-full bg-indigo-500/10 hover:bg-indigo-600 hover:text-white p-4 rounded-2xl text-xs font-black transition flex justify-center items-center gap-2">
                             <i data-lucide="copy"></i> نسخ الكابشن
                         </button>
                     </div>
@@ -244,6 +252,7 @@
             showTab('viewSection');
         };
 
+        // التهيئة الأولية
         fetchData();
         lucide.createIcons();
     </script>
